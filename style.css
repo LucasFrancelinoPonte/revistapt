@@ -1,10 +1,9 @@
 /* ============================================
-   DIACRONIA: AS NOVAS CUNHATÃS
-   Revista Digital Interativa - Sistema de Design
+   DIACRONIA V2: AS NOVAS CUNHATÃS
+   Sistema de Design com Centralização Dinâmica
    ============================================ */
 
 :root {
-    /* Paleta de Cores Institucional */
     --navy-deep: #0a1f44;
     --gold-matte: #c5a059;
     --gold-light: #d4b378;
@@ -13,19 +12,16 @@
     --cream: #fdfbf7;
     --text-dark: #1a1a1a;
     --text-gray: #4a4a4a;
-    --text-light: #7a7a7a;
     --divider: #d0d0d0;
     
-    /* Dimensões */
-    --page-width: 600px;
-    --page-height: 850px;
-    --page-padding: 60px;
+    /* Dimensões Responsivas (baseadas em viewport) */
+    --page-width: min(45vw, 500px);
+    --page-height: 85vh;
+    --page-padding: min(5vw, 50px);
     
-    /* Animações */
     --anim-duration: 1s;
     --anim-easing: cubic-bezier(0.645, 0.045, 0.355, 1);
     
-    /* Tipografia */
     --font-display: "Playfair Display", serif;
     --font-body: "Lato", sans-serif;
 }
@@ -39,6 +35,7 @@
 html {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -68,6 +65,9 @@ body::before {
     z-index: 0;
 }
 
+/* ============================================
+   LOADING SCREEN
+   ============================================ */
 .loading-screen {
     position: fixed;
     top: 0;
@@ -86,6 +86,7 @@ body::before {
 .loading-screen.hidden {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
 }
 
 .spinner {
@@ -109,14 +110,19 @@ body::before {
     letter-spacing: 2px;
 }
 
+/* ============================================
+   MAGAZINE WRAPPER
+   ============================================ */
 .magazine-wrapper {
     width: 100%;
-    max-width: 1400px;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     position: relative;
     z-index: 1;
+    padding: 20px;
 }
 
 .magazine-header {
@@ -124,14 +130,14 @@ body::before {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 1200px;
-    padding: 20px 40px;
-    margin-bottom: 20px;
+    max-width: 1400px;
+    padding: 15px 30px;
+    margin-bottom: 15px;
 }
 
 .logo {
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
     font-weight: 900;
     letter-spacing: 4px;
     color: var(--gold-matte);
@@ -140,7 +146,7 @@ body::before {
 
 .page-counter {
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 1.5vw, 1rem);
     color: var(--paper-white);
     letter-spacing: 1px;
 }
@@ -150,14 +156,30 @@ body::before {
     color: var(--gold-matte);
 }
 
+/* ============================================
+   BOOK CONTAINER - CENTRALIZAÇÃO DINÂMICA
+   ============================================ */
 .book-container {
     perspective: 3000px;
     perspective-origin: center center;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    transition: transform 0.8s var(--anim-easing);
+    flex: 1;
+    width: 100%;
+    max-width: 1400px;
+    position: relative;
+    transition: transform var(--anim-duration) var(--anim-easing);
+}
+
+/* ESTADO FECHADO: Livro centralizado */
+.book-container.closed {
+    transform: translateX(0);
+}
+
+/* ESTADO ABERTO: Livro desloca para manter spine no centro */
+.book-container.open {
+    transform: translateX(calc(var(--page-width) / 4));
 }
 
 .book {
@@ -168,6 +190,9 @@ body::before {
     transition: transform 0.5s;
 }
 
+/* ============================================
+   PAGE STRUCTURE
+   ============================================ */
 .page {
     position: absolute;
     width: 100%;
@@ -184,6 +209,7 @@ body::before {
     transform: rotateY(-180deg);
 }
 
+/* Front and Back Faces */
 .front, .back {
     position: absolute;
     width: 100%;
@@ -198,15 +224,25 @@ body::before {
 
 .front {
     z-index: 2;
-    border-left: 1px solid rgba(10, 31, 68, 0.1);
+    /* Sombra na lombada esquerda (spine shadow) */
+    background-image: 
+        linear-gradient(to right, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 3%, transparent 8%);
+    border-left: 1px solid rgba(10, 31, 68, 0.15);
 }
 
 .back {
     transform: rotateY(180deg);
     z-index: 1;
-    border-right: 1px solid rgba(10, 31, 68, 0.1);
+    /* Sombra na lombada direita (para o verso) */
+    background-image: 
+        linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 3%, transparent 8%);
+    border-right: 1px solid rgba(10, 31, 68, 0.15);
+    background-color: #f9f9f9;
 }
 
+/* ============================================
+   PAGE CONTENT BASE
+   ============================================ */
 .page-content {
     width: 100%;
     height: 100%;
@@ -214,90 +250,104 @@ body::before {
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: hidden;
 }
 
 .page-content::before {
     content: "";
     position: absolute;
-    top: 30px;
-    left: 30px;
-    right: 30px;
-    bottom: 30px;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
     border: 1px solid var(--gold-matte);
-    opacity: 0.3;
+    opacity: 0.25;
     pointer-events: none;
+    z-index: 0;
 }
 
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
 .page-title {
     font-family: var(--font-display);
-    font-size: 3rem;
+    font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 700;
     color: var(--navy-deep);
     line-height: 1.1;
     margin-bottom: 15px;
     text-transform: uppercase;
     letter-spacing: 2px;
+    position: relative;
+    z-index: 1;
 }
 
 .page-subtitle {
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 1.5vw, 1rem);
     font-weight: 700;
     color: var(--gold-matte);
     text-transform: uppercase;
     letter-spacing: 3px;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
     border-bottom: 2px solid var(--gold-matte);
     display: inline-block;
-}
-
-.page-headline {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 400;
-    font-style: italic;
-    color: var(--text-gray);
-    line-height: 1.3;
-    margin-bottom: 25px;
+    position: relative;
+    z-index: 1;
 }
 
 .page-text {
     font-family: var(--font-body);
-    font-size: 1.05rem;
-    line-height: 1.8;
+    font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+    line-height: 1.7;
     color: var(--text-dark);
     text-align: justify;
-    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    flex: 1;
 }
 
 .page-text p {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
-.page-text.with-drop-cap p:first-of-type::first-letter {
-    font-family: var(--font-display);
-    font-size: 5rem;
-    line-height: 0.8;
-    float: left;
-    margin: 10px 15px 0 0;
-    color: var(--navy-deep);
-    font-weight: 700;
+.page-caption {
+    font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+    font-style: italic;
+    color: var(--text-gray);
+    margin-top: 8px;
+    text-align: center;
 }
 
-.two-column {
-    column-count: 2;
-    column-gap: 40px;
-    column-rule: 1px solid var(--divider);
-}
-
+/* ============================================
+   COVER PAGE (Full Background Image)
+   ============================================ */
 .page-type-cover .front {
-    background: linear-gradient(135deg, var(--navy-deep) 0%, #0d2a5a 100%);
-    color: white;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    position: relative;
+}
+
+.page-type-cover .front::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(10, 31, 68, 0.85) 0%, rgba(10, 31, 68, 0.7) 100%);
+    z-index: 0;
+}
+
+.page-type-cover .page-content {
+    justify-content: center;
+    z-index: 1;
 }
 
 .page-type-cover .page-content::before {
@@ -306,133 +356,107 @@ body::before {
 }
 
 .page-type-cover .page-title {
-    font-size: 5rem;
+    font-size: clamp(3rem, 8vw, 5rem);
     color: var(--gold-matte);
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
     margin-bottom: 20px;
     letter-spacing: 8px;
 }
 
 .page-type-cover .page-subtitle {
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
     color: white;
     border: none;
-    letter-spacing: 2px;
-    margin-bottom: 40px;
-    opacity: 0.9;
+    letter-spacing: 3px;
+    margin-bottom: 30px;
+    opacity: 0.95;
 }
 
 .page-type-cover .cover-date {
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
     color: var(--gold-light);
     letter-spacing: 2px;
     margin-top: auto;
 }
 
-.page-type-cover .cover-image {
-    width: 100%;
-    max-width: 400px;
-    height: 300px;
-    object-fit: cover;
-    margin: 30px auto;
-    border: 3px solid var(--gold-matte);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
+/* ============================================
+   EDITORIAL
+   ============================================ */
 .page-type-editorial .page-text {
-    font-size: 1.15rem;
-    line-height: 2;
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    line-height: 1.9;
     font-style: italic;
 }
 
-.editorial-author {
+.editorial-image {
+    width: 60%;
+    max-height: 200px;
+    object-fit: cover;
+    margin: 20px auto;
+    border: 2px solid var(--gold-matte);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.editorial-signature {
     margin-top: auto;
-    padding-top: 30px;
+    padding-top: 25px;
     border-top: 2px solid var(--gold-matte);
     text-align: right;
-}
-
-.editorial-author .name {
     font-family: var(--font-display);
-    font-size: 1.3rem;
+    font-size: clamp(1rem, 2vw, 1.2rem);
     font-weight: 700;
     color: var(--navy-deep);
-    display: block;
 }
 
-.editorial-author .role {
-    font-size: 0.95rem;
-    color: var(--text-gray);
-    font-style: italic;
-    margin-top: 5px;
-}
-
-.page-type-toc .toc-list {
-    list-style: none;
-    margin-top: 40px;
-}
-
-.page-type-toc .toc-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--divider);
-    transition: all 0.3s;
-}
-
-.page-type-toc .toc-item:hover {
-    padding-left: 10px;
-    border-bottom-color: var(--gold-matte);
-}
-
-.page-type-toc .toc-label {
-    font-family: var(--font-display);
-    font-size: 1.2rem;
-    color: var(--navy-deep);
-    flex: 1;
-}
-
-.page-type-toc .toc-page {
-    font-family: var(--font-body);
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--gold-matte);
-    margin-left: 20px;
-}
-
-.page-type-article .article-image {
+/* ============================================
+   ARTICLE LEFT/RIGHT (Two-Page Spread)
+   ============================================ */
+.page-type-article-left .article-image,
+.page-type-article-right .article-image {
     width: 100%;
-    height: 300px;
+    height: 40%;
     object-fit: cover;
-    margin: 25px 0;
+    margin: 20px 0;
     border: 1px solid var(--divider);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.page-type-article-right .images-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.page-type-article-right .images-gallery img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border: 1px solid var(--divider);
 }
 
 .pdf-link {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 24px;
+    gap: 8px;
+    padding: 10px 20px;
     background: transparent;
     border: 2px solid var(--navy-deep);
     color: var(--navy-deep);
     text-decoration: none;
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
     text-transform: uppercase;
     letter-spacing: 1px;
     transition: all 0.3s;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .pdf-link:hover {
     background: var(--navy-deep);
     color: white;
-    box-shadow: 0 4px 15px rgba(10, 31, 68, 0.3);
 }
 
 .pdf-link::after {
@@ -440,181 +464,150 @@ body::before {
     font-size: 1.2rem;
 }
 
-.page-type-profiles .profiles-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    margin-top: 30px;
-}
-
-.profile-card {
-    padding: 20px;
-    background: white;
-    border-left: 4px solid var(--gold-matte);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.profile-card .profile-name {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--navy-deep);
-    margin-bottom: 10px;
-}
-
-.profile-card .profile-desc {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--text-gray);
-}
-
-.page-type-quote-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.page-type-quote-page .page-content {
-    justify-content: center;
-    text-align: center;
-}
-
-.page-type-quote-page .quote-text {
-    font-family: var(--font-display);
-    font-size: 2.5rem;
-    font-style: italic;
-    line-height: 1.4;
-    color: var(--navy-deep);
-    margin-bottom: 30px;
-    position: relative;
-}
-
-.page-type-quote-page .quote-text::before,
-.page-type-quote-page .quote-text::after {
-    font-family: Georgia, serif;
-    font-size: 6rem;
-    color: var(--gold-matte);
-    opacity: 0.3;
-    position: absolute;
-}
-
-.page-type-quote-page .quote-text::before {
-    content: "\201C";
-    top: -40px;
-    left: -20px;
-}
-
-.page-type-quote-page .quote-text::after {
-    content: "\201D";
-    bottom: -80px;
-    right: -20px;
-}
-
-.page-type-quote-page .quote-author {
-    font-family: var(--font-body);
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--gold-dark);
-    letter-spacing: 2px;
-}
-
-.page-type-chart .chart-highlight,
-.page-type-data-box .data-highlight {
-    background: var(--navy-deep);
-    color: white;
-    padding: 30px;
-    margin: 30px 0;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(10, 31, 68, 0.2);
-}
-
-.page-type-chart .chart-highlight {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.3;
-}
-
-.page-type-data-box .data-list {
-    list-style: none;
-    margin-top: 30px;
-}
-
-.page-type-data-box .data-item {
-    padding: 15px 20px;
-    margin-bottom: 15px;
-    background: white;
-    border-left: 4px solid var(--gold-matte);
-    font-size: 1.1rem;
-    line-height: 1.6;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.page-type-data-box .data-item::before {
-    content: "";
-    color: var(--gold-matte);
-    margin-right: 10px;
-    font-weight: 700;
-}
-
-.page-type-list .list-items {
-    list-style: none;
-    margin-top: 30px;
-    counter-reset: list-counter;
-}
-
-.page-type-list .list-items li {
-    padding: 20px 25px;
-    margin-bottom: 20px;
-    background: linear-gradient(to right, rgba(197, 160, 89, 0.1) 0%, transparent 100%);
-    border-left: 4px solid var(--navy-deep);
-    font-size: 1.15rem;
-    line-height: 1.6;
-    position: relative;
-}
-
-.page-type-list .list-items li::before {
-    content: counter(list-counter);
-    counter-increment: list-counter;
-    position: absolute;
-    left: -15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
-    background: var(--gold-matte);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-}
-
-.page-type-image-full .full-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+/* ============================================
+   FULL IMAGE PAGE
+   ============================================ */
+.page-type-full-image .full-bg {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
 }
 
-.page-type-image-full .image-caption {
+.page-type-full-image .overlay-content {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     background: linear-gradient(to top, rgba(10, 31, 68, 0.95) 0%, transparent 100%);
     color: white;
-    padding: 40px 60px 30px;
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    font-style: italic;
-    line-height: 1.5;
+    padding: 40px 30px 30px;
+    z-index: 1;
 }
 
+.page-type-full-image .title-overlay {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--gold-matte);
+    margin-bottom: 10px;
+}
+
+.page-type-full-image .text-overlay {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.6;
+}
+
+/* ============================================
+   TEXT PAGE WITH QUOTE
+   ============================================ */
+.page-type-text-page .quote-box {
+    background: var(--navy-deep);
+    color: white;
+    padding: 25px;
+    margin: 20px 0;
+    border-left: 4px solid var(--gold-matte);
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-style: italic;
+    line-height: 1.6;
+}
+
+/* ============================================
+   CHART PAGE
+   ============================================ */
+.page-type-chart-page .chart-visual {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 200px;
+    margin: 30px 0;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(197, 160, 89, 0.1) 0%, transparent 100%);
+    border: 1px solid var(--divider);
+}
+
+.page-type-chart-page .chart-bar {
+    flex: 1;
+    background: var(--gold-matte);
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.page-type-chart-page .chart-bar:hover {
+    background: var(--gold-dark);
+}
+
+.page-type-chart-page .bar-value {
+    position: absolute;
+    top: -25px;
+    font-weight: 700;
+    color: var(--navy-deep);
+    font-size: 1.2rem;
+}
+
+.page-type-chart-page .bar-label {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+/* ============================================
+   PROFILE GRID
+   ============================================ */
+.page-type-profile-grid .profiles-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.page-type-profile-grid .profile-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+    background: white;
+    border-left: 4px solid var(--gold-matte);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.page-type-profile-grid .profile-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--gold-matte);
+}
+
+.page-type-profile-grid .profile-info {
+    flex: 1;
+}
+
+.page-type-profile-grid .profile-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    font-weight: 700;
+    color: var(--navy-deep);
+    margin-bottom: 5px;
+}
+
+.page-type-profile-grid .profile-role {
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+    color: var(--text-gray);
+}
+
+/* ============================================
+   BACK COVER
+   ============================================ */
 .page-type-back-cover .back {
     background: linear-gradient(135deg, #0d2a5a 0%, var(--navy-deep) 100%);
     color: white;
@@ -630,52 +623,53 @@ body::before {
 
 .page-type-back-cover .page-title {
     color: var(--gold-matte);
-    font-size: 4rem;
+    font-size: clamp(3rem, 6vw, 4rem);
     letter-spacing: 6px;
 }
 
 .page-type-back-cover .back-footer {
-    font-size: 0.95rem;
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
     color: var(--gold-light);
     letter-spacing: 1px;
     line-height: 1.8;
 }
 
-.page-type-back-cover .back-contact {
-    font-size: 1rem;
+.page-type-back-cover .back-website {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
     color: white;
-    margin-top: 20px;
+    margin-top: 15px;
     font-weight: 700;
 }
 
-.page-type-text-only.small-text .page-text {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    white-space: pre-line;
-}
-
+/* ============================================
+   PAGE NUMBER
+   ============================================ */
 .page-number {
     position: absolute;
-    bottom: 30px;
+    bottom: 25px;
     font-family: var(--font-display);
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
     font-style: italic;
     color: var(--gold-matte);
     font-weight: 700;
+    z-index: 10;
 }
 
 .front .page-number {
-    right: 60px;
+    right: var(--page-padding);
 }
 
 .back .page-number {
-    left: 60px;
+    left: var(--page-padding);
 }
 
+/* ============================================
+   CONTROLS
+   ============================================ */
 .controls {
     display: flex;
     gap: 20px;
-    margin-top: 40px;
+    margin-top: 20px;
     z-index: 100;
 }
 
@@ -683,13 +677,13 @@ body::before {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 15px 30px;
+    padding: 12px 25px;
     background: transparent;
     border: 2px solid var(--gold-matte);
     color: var(--gold-matte);
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 1.5vw, 1rem);
     text-transform: uppercase;
     letter-spacing: 2px;
     cursor: pointer;
@@ -731,46 +725,88 @@ body::before {
 }
 
 .nav-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
-@media (max-width: 1024px) {
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1200px) {
     :root {
-        --page-width: 500px;
-        --page-height: 700px;
-        --page-padding: 40px;
-    }
-    
-    .page-title {
-        font-size: 2.5rem;
-    }
-    
-    .two-column {
-        column-count: 1;
+        --page-width: min(48vw, 450px);
+        --page-height: 80vh;
     }
 }
 
 @media (max-width: 768px) {
     :root {
-        --page-width: 90vw;
-        --page-height: 85vh;
-        --page-padding: 30px;
+        --page-width: 85vw;
+        --page-height: 75vh;
+        --page-padding: 25px;
     }
     
-    .logo {
-        font-size: 1.5rem;
+    .book-container.open {
+        transform: translateX(0);
     }
     
-    .page-title {
-        font-size: 2rem;
-    }
-    
-    .page-type-cover .page-title {
-        font-size: 3rem;
+    .magazine-header {
+        padding: 10px 20px;
     }
     
     .nav-btn span {
         display: none;
+    }
+    
+    .nav-btn {
+        padding: 12px 18px;
+    }
+    
+    .page-type-article-right .images-gallery {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --page-width: 90vw;
+        --page-height: 70vh;
+        --page-padding: 20px;
+    }
+    
+    .page-content::before {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY & PERFORMANCE
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+    }
+    
+    .magazine-header,
+    .controls,
+    .loading-screen {
+        display: none;
+    }
+    
+    .page {
+        position: relative;
+        page-break-after: always;
     }
 }
