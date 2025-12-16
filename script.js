@@ -1,465 +1,296 @@
-/* ============================================
-   DIACRONIA — WEB EDITION (INFINITE SCROLL)
-   Revista como página web com rolagem infinita
-   ============================================ */
-
-const FALLBACK_IMAGE = 'assets/images/mulheres_parlamentares.jfif';
-
-// Conteúdo base (será repetido/reciclado no infinite scroll)
-const magazineData = [
+/* Render dynamic landing from `magazineSections` array.
+   - Builds header nav, hero, and content sections
+   - Updates progress bar and QR in footer
+   - Safe path resolution for assets
+*/
+const magazineContent = [
+    // --- SEÇÃO 1: HERO (CAPA) ---
     {
-        type: 'cover',
-        title: 'Diacronia',
-        subtitle: 'As Novas Cunhatãs: Gênero, Tradição e Ruptura',
+        type: 'hero',
+        layout: 'fullscreen',
+        title: 'DIACRONIA',
+        subtitle: 'As Novas Cunhatãs: Gênero, Tradição e Ruptura na Paraíba',
         date: 'Dezembro 2025',
-        image: 'assets/images/mulheres na politica.jfif'
+        backgroundImage: 'assets/images/imagem1.jpeg', // Imagem de fundo
+        overlayOpacity: 0.6, // Escurecer imagem para ler o texto
+        ctaText: 'Ler a Edição',
+        ctaLink: '#editorial'
     },
-    {
-        type: 'text-page',
-        title: 'Expediente',
-        text: `**Editor-Chefe:** Fabrício Endreon.
-**Design e Diagramação:** Equipe Diacronia.
-**Pesquisa e Curadoria:** Núcleo de Estudos e Dados.
 
-ISSN 2966-0521. Publicação dedicada à análise política e social da Paraíba.`
-    },
+    // --- SEÇÃO 2: EDITORIAL ---
     {
-        type: 'editorial',
-        title: 'Editorial',
-        content: `A presença feminina na política da Paraíba segue em crescimento e, com ela, cresce também a sofisticação do debate público.
+        type: 'text-block',
+        id: 'editorial',
+        layout: 'image-right',
+        category: 'Editorial',
+        title: 'A Força da História',
+        text: `A presença feminina na política da Paraíba não é apenas estatística; é uma narrativa de ruptura. Desde a conquista do voto em 1932 até a atual bancada histórica na ALPB, esta edição celebra a resistência.
+        
+        Com base em dados acadêmicos e fatos históricos, traçamos o perfil de quem decide o futuro do estado, desafiando o coronelismo e as estruturas tradicionais de poder.`,
+        author: 'Renan Rodrigues',
+        role: 'Editor-Chefe',
+        image: 'assets/images/imagem2.jpeg'
+    },
 
-Nesta edição, organizamos uma leitura rápida, visual e baseada em dados — sem perder o fio histórico que explica como chegamos até aqui.`,
-        signature: 'Os Editores',
-        image: 'assets/images/elas_por_elas.jfif'
-    },
+    // --- SEÇÃO 3: ARTIGO HISTÓRICO (Fonte: nayara_sandy.pdf) ---
     {
-        type: 'toc',
-        title: 'Nesta Edição',
-        items: [
-            { page: 5, label: 'Capa: A Bancada da Resistência' },
-            { page: 7, label: 'Números: Eleições 2024' },
-            { page: 9, label: 'Dossiê: O Poder Local' },
-            { page: 13, label: 'Análise: Democracia e Gênero' },
-            { page: 17, label: 'Leis e Proteção' },
-            { page: 21, label: 'Fechamento' }
-        ]
+        type: 'feature-story',
+        layout: 'image-left',
+        category: 'Memória',
+        title: 'As Pioneiras do Voto',
+        headline: 'Onde tudo começou: De Dulce a Vani',
+        content: `A história política feminina na Paraíba tem marcos indeléveis. Maria Dulce Barbosa fez história na década de 1960 ao ser eleita a primeira prefeita do estado, no município de Queimadas, rompendo com a noção de que o executivo era lugar exclusivo de homens.
+        
+        No legislativo estadual, o silêncio foi quebrado em 1982 por Vani Braga, a primeira deputada estadual eleita. Sua trajetória pavimentou o caminho para que, décadas depois, a ALPB alcançasse sua segunda maior bancada feminina da história.`,
+        image: 'assets/images/Vani-Braga1-1024x710.jpg',
+        caption: 'Vani Braga: A voz pioneira na Casa de Epitácio Pessoa.',
+        pdfButton: { label: 'Ler Artigo Acadêmico', link: 'assets/pdfs/nayara_sandy,+artigo_6.pdf' }
     },
-    {
-        type: 'full-image-title',
-        image: 'assets/images/mulheres_parlamentares.jfif',
-        title: 'A Bancada da Resistência',
-        subtitle: 'Representatividade que vira pauta e política pública.'
-    },
-    {
-        type: 'text-page',
-        title: 'Quem ocupa a tribuna',
-        text: `A força política não está apenas no número de cadeiras, mas na capacidade de pautar temas e construir maioria.
 
-Nesta legislatura, a bancada feminina consolida três frentes de atuação:
+    // --- SEÇÃO 4: PERFIL DA BANCADA (Fonte: ALPB.html) ---
+    {
+        type: 'grid-profiles',
+        title: 'A Bancada da Resistência (2025)',
+        description: 'Conheça as seis deputadas que compõem a atual legislatura da Assembleia Legislativa da Paraíba:',
+        columns: 3,
+        cards: [
+            {
+                name: 'Francisca Mota',
+                role: 'Decana (Republicanos)',
+                bio: 'Com seis mandatos, é a voz da experiência. Já foi prefeita de Patos e presidente da ALPB.',
+                img: 'assets/images/franscica mota.jpg'
+            },
+            {
+                name: 'Cida Ramos',
+                role: 'Deputada (PT)',
+                bio: 'Professora da UFPB, foi a mais votada em 2018. Atuação forte em direitos humanos e assistência social.',
+                img: 'assets/images/deputada-Cida-Ramos-removebg-preview.png'
+            },
+            {
+                name: 'Camila Toscano',
+                role: 'Deputada (PSDB)',
+                bio: 'Advogada, foca seu mandato na defesa dos direitos da mulher, especialmente na região do Brejo.',
+                img: 'assets/images/Camila-Toscano-1-removebg-preview.png'
+            },
+            {
+                name: 'Dra. Paula',
+                role: 'Deputada (PP)',
+                bio: 'Médica com forte atuação no Sertão e Cajazeiras, defendendo a saúde pública.',
+                img: 'assets/images/dr paula.jpg'
+            },
+            {
+                name: 'Dra. Jane Panta',
+                role: 'Deputada (PP)',
+                bio: 'Cardiologista e representante de Santa Rita, focada na saúde metropolitana.',
+                img: 'assets/images/jane.jpg'
+            },
+            {
+                name: 'Silvia Benjamin',
+                role: 'Deputada (Republicanos)', // Atualizado conforme imagem disponível
+                bio: 'Nova força política representando a renovação no parlamento estadual.',
+                img: 'assets/images/silvia.jpg'
+            }
+        ],
+        pdfButton: { label: 'Ver Perfil Completo (ALPB)', link: 'https://www.al.pb.leg.br/' }
+    },
 
-1. **Proteção social e direitos humanos**
-2. **Saúde e cuidado**
-3. **Desenvolvimento e autonomia econômica**`,
-        quote: '"Representatividade é presença + voz + permanência."'
-    },
+    // --- SEÇÃO 5: ESTATÍSTICAS E ANÁLISE (Fonte: RELF_Democracia.pdf) ---
     {
-        type: 'chart-page',
-        title: 'Eleições 2024 em números',
-        text: `A Paraíba registrou **53 prefeitas** e **453 vereadoras**. O salto é relevante, mas ainda desigual entre municípios e regiões.
+        type: 'stats-section',
+        theme: 'dark', // Fundo azul marinho/preto
+        title: 'O Paradoxo do Eleitor',
+        headline: 'O que pensam os paraibanos?',
+        text: 'Uma pesquisa exclusiva revela uma dissonância entre o discurso e a prática nas urnas:',
+        stats: [
+            { value: '92%', label: 'dos eleitores percebem resistência contra mulheres na política' },
+            { value: '63%', label: 'afirmam que o gênero NÃO influencia seu voto' },
+            { value: '49%', label: 'apontam a falta de apoio partidário como maior barreira' }
+        ],
+        image: 'assets/images/generuc politic.jfif', // fallback/name from assets
+        pdfButton: { label: 'Ler Análise Completa', link: 'assets/pdfs/RELF_Democracia+Representativa+e+Igualdade+de+Gênero_+A+participação+da+Mulher+na+Política+Paraibana+sem+marcas+de+revisão.pdf' }
+    },
 
-O dado central: crescimento acontece quando partido investe, quando há rede de apoio e quando a violência política é combatida.`,
-        chartData: { Prefeitas: 53, Vereadoras: 453 },
-        pdfLink: 'assets/pdfs/Mulheres na Política Paraibana_ Guia.pdf'
-    },
+    // --- SEÇÃO 6: DOSSIÊ PREFEITAS (Fonte: nayara_sandy.pdf) ---
     {
-        type: 'text-page',
-        title: 'O que muda de verdade',
-        text: `Ganhar eleição é só a primeira etapa. Governar com agenda própria exige:
+        type: 'text-block',
+        layout: 'image-left',
+        category: 'Poder Local',
+        title: 'Quem Governa as Cidades?',
+        content: `Estudos revelam o perfil das gestoras municipais na Paraíba:
+        
+        Perfil: Maioria casada, entre 30 e 50 anos, com Ensino Superior completo (57%).
+        Território: Governam majoritariamente municípios pequenos (menos de 10 mil habitantes) e com baixo IDH.
+        Desafio: O "fator parentesco" ainda é decisivo para a validação política em muitas regiões.`,
+        image: 'assets/images/imagem3.jpg',
+        pdfButton: { label: 'Ler Artigo Sobre Prefeitas', link: 'assets/pdfs/nayara_sandy,+artigo_6.pdf' }
+    },
 
-**Equipe técnica**, **comunicação**, **proteção institucional** e **articulação legislativa**.
-
-Quando essas condições existem, políticas de saúde, assistência e educação tendem a ter maior continuidade e alcance.`,
-        pdfLink: 'assets/pdfs/Mulheres na Política Paraibana_ Guia.pdf'
-    },
+    // --- SEÇÃO 7: RODAPÉ COM QR CODE ---
     {
-        type: 'full-image-title',
-        image: 'assets/images/generuc politic.jfif',
-        title: 'Dossiê: O Poder Local',
-        subtitle: 'Prefeituras, redes familiares e o desafio da autonomia.'
-    },
-    {
-        type: 'text-page',
-        title: 'Perfil das gestoras',
-        text: `Em municípios menores, a entrada na política local é muitas vezes mediada por estruturas tradicionais.
-
-Isso não invalida o mérito — mas ajuda a entender por que **autonomia política** e **recursos partidários** são decisivos para mandatos transformadores.`,
-        pdfLink: 'assets/pdfs/nayara_sandy,+artigo_6.pdf'
-    },
-    {
-        type: 'text-page',
-        title: 'Parentesco e autonomia',
-        text: `O “fator parentesco” aparece com frequência em trajetórias municipais. A leitura crítica não é moralista: é estrutural.
-
-Quando a política local concentra poder, **novas lideranças** tendem a entrar pelo caminho disponível — e depois disputar espaço para existir por si.`,
-        quote: '"A pergunta não é quem abriu a porta, e sim quem sustenta o mandato."'
-    },
-    {
-        type: 'chart-page',
-        title: 'Crescimento (2020 → 2024)',
-        text: `A evolução do número de prefeitas mostra avanço consistente. O ponto frágil segue sendo a **distribuição territorial** e a **capacidade de reeleição**.
-
-Mais do que eleger, é preciso garantir permanência com segurança e recursos.`,
-        chartData: { 2020: 37, 2024: 53 },
-        pdfLink: 'assets/pdfs/nayara_sandy,+artigo_6.pdf'
-    },
-    {
-        type: 'full-image-title',
-        image: 'assets/images/mulheres na politica.jfif',
-        title: 'Democracia e Gênero',
-        subtitle: 'A igualdade formal não basta.'
-    },
-    {
-        type: 'text-page',
-        title: 'A ilusão da igualdade',
-        text: `Se as regras são as mesmas, por que os resultados são tão diferentes?
-
-A resposta está no que não aparece na urna: financiamento, estrutura de campanha, tempo de TV, redes partidárias e a violência simbólica cotidiana.`,
-        pdfLink: 'assets/pdfs/RELF_Democracia+Representativa+e+Igualdade+de+Gênero_+A+participação+da+Mulher+na+Política+Paraibana+sem+marcas+de+revisão.pdf'
-    },
-    {
-        type: 'chart-page',
-        title: 'O que o eleitor percebe',
-        text: `Muitos afirmam que gênero não influencia o voto. Ao mesmo tempo, quase todos reconhecem resistência cultural.
-
-É a dissonância entre discurso e prática — e ela cobra um preço nas candidaturas e no exercício do mandato.`,
-        chartData: { 'Resistência percebida (%)': 92, 'Gênero não influencia (%)': 63 },
-        pdfLink: 'assets/pdfs/RELF_Democracia+Representativa+e+Igualdade+de+Gênero_+A+participação+da+Mulher+na+Política+Paraibana+sem+marcas+de+revisão.pdf'
-    },
-    {
-        type: 'text-page',
-        title: 'Violência política',
-        text: `Violência política de gênero não é só agressão explícita. Também é sabotagem, deslegitimação e isolamento institucional.
-
-Quando a regra é “cansar” a parlamentar, a resposta precisa ser rede, transparência e mecanismos formais de denúncia.`,
-        pdfLink: 'assets/pdfs/JNBL07062017.pdf'
-    },
-    {
-        type: 'full-image-title',
-        image: 'assets/images/elas_por_elas.jfif',
-        title: 'Leis e Proteção',
-        subtitle: 'O Estado como garantidor de direitos.'
-    },
-    {
-        type: 'text-page',
-        title: 'O que entra na pauta',
-        text: `A agenda legislativa com recorte de gênero costuma priorizar três eixos:
-
-1. **Proteção contra violência** (inclusive política)
-2. **Saúde da mulher** (prevenção, diagnóstico e cuidado)
-3. **Autonomia econômica** (crédito, capacitação e emprego)`,
-        pdfLink: 'assets/pdfs/Mulheres na política paraibana (1).pdf'
-    },
-    {
-        type: 'text-page',
-        title: 'Instituições importam',
-        text: `Leis são base — mas só funcionam com orçamento, serviço público e fiscalização.
-
-Quando o Estado organiza rede de atendimento e dados confiáveis, a política deixa de ser promessa e vira proteção real.`,
-        quote: '"Política pública é método: diagnóstico, ação, avaliação."'
-    },
-    {
-        type: 'text-page',
-        title: 'Fechamento',
-        text: `A diacronia das mulheres na política paraibana é feita de ruptura e permanência: romper barreiras e permanecer no jogo.
-
-O próximo salto é qualidade democrática: financiamento justo, segurança institucional e paridade como regra — não exceção.`,
-        signature: 'Diacronia'
-    },
-    {
-        type: 'text-page',
-        title: 'Referências (seleção)',
-        text: `**Guia:** Mulheres na Política Paraibana.
-**Artigo:** Nayara Sandy — perfil das prefeitas.
-**Estudo:** RELF — democracia representativa e igualdade de gênero.
-
-Os PDFs citados estão disponíveis nos botões ao longo da revista.`
-    },
-    {
-        type: 'back-cover',
-        title: 'Diacronia',
-        footer: 'ISSN 2966-0521 | João Pessoa - PB | Dezembro 2025\nRevista digital interativa',
-        website: 'www.revistadiacronia.com.br'
+        type: 'footer-qrcode',
+        title: 'Acesse o Conteúdo Estendido',
+        text: 'Escaneie para acessar vídeos das sessões, documentos originais e a versão mobile.',
+        qrImage: 'assets/pdfs/qrcode.jpg',
+        copyright: '© 2025 Revista Diacronia | ISSN 2966-0521'
     }
 ];
 
-function escapeHtml(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+/* --- Helpers --- */
+function create(tag, props={}, children=[]) {
+  const el = document.createElement(tag);
+  for(const k in props){
+    if(k==='class') el.className = props[k];
+    else if(k==='html') el.innerHTML = props[k];
+    else if(k==='attr') for(const a in props.attr) el.setAttribute(a, props.attr[a]);
+    else el.setAttribute(k, props[k]);
+  }
+  (Array.isArray(children)?children:[children]).forEach(c=>{ if(!c) return; if(typeof c==='string') el.appendChild(document.createTextNode(c)); else el.appendChild(c); });
+  return el;
 }
 
-function formatInline(text) {
-    const escaped = escapeHtml(text);
-    return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+function safePath(p){ return p || ''; }
+
+/* --- Renderers for requested types --- */
+function renderHero(s){
+  const sec = create('section',{class:'hero hero--full', attr:{style:`background-image:url(${safePath(s.backgroundImage)});`} });
+  const overlay = create('div',{class:'hero-overlay'});
+  overlay.style.opacity = (s.overlayOpacity!=null? s.overlayOpacity : 0.5);
+  sec.appendChild(overlay);
+  const inner = create('div',{class:'container hero-inner'});
+  inner.appendChild(create('h1',{class:'hero-title',html: s.title}));
+  inner.appendChild(create('p',{class:'hero-sub',html: s.subtitle}));
+  inner.appendChild(create('p',{class:'hero-date',html: s.date}));
+  if(s.ctaText){
+    const a = create('a',{class:'btn-cta',href:s.ctaLink||'#'} , [s.ctaText]);
+    a.addEventListener('click', e=>{ e.preventDefault(); document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'}); });
+    inner.appendChild(a);
+  }
+  sec.appendChild(inner);
+  return sec;
 }
 
-function formatRichText(text) {
-    const raw = String(text ?? '');
-    const paragraphs = raw.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
-    if (paragraphs.length === 0) return '';
-    return paragraphs
-        .map(p => `<p>${formatInline(p).replace(/\n/g, '<br>')}</p>`)
-        .join('');
+function renderTextBlock(s){
+  const sec = create('section',{id: s.id||'', class:'section text-block'});
+  const cont = create('div',{class:'container text-block__grid'});
+  const imgWrap = create('div',{class:'text-block__image'});
+  imgWrap.appendChild(create('img',{src:safePath(s.image), alt: s.title || ''}));
+  const txt = create('div',{class:'text-block__content'});
+  if(s.category) txt.appendChild(create('div',{class:'muted',html: s.category}));
+  txt.appendChild(create('h2',{html: s.title}));
+  txt.appendChild(create('div',{class:'text-block__body', html: s.text || s.content || ''}));
+  if(s.author) txt.appendChild(create('p',{class:'muted',html: `— ${s.author}${s.role? ', '+s.role: ''}`}));
+  if(s.pdfButton) txt.appendChild(create('a',{class:'btn-pdf',href:safePath(s.pdfButton.link),target:'_blank',rel:'noopener'}, [s.pdfButton.label]));
+  if((s.layout||'image-right') === 'image-left') cont.appendChild(imgWrap), cont.appendChild(txt);
+  else cont.appendChild(txt), cont.appendChild(imgWrap);
+  sec.appendChild(cont);
+  return sec;
 }
 
-function imgFallbackAttr() {
-    return `onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}';"`;
+function renderFeatureStory(s){
+  const sec = create('section',{class:'section feature-story'});
+  const cont = create('div',{class:'container split-grid'});
+  const media = create('div',{class:'split-media'});
+  media.appendChild(create('img',{src:safePath(s.image), alt:s.title||''}));
+  const text = create('div',{class:'split-text'});
+  if(s.category) text.appendChild(create('div',{class:'muted',html: s.category}));
+  text.appendChild(create('h2',{html: s.title}));
+  if(s.headline) text.appendChild(create('h3',{html: s.headline}));
+  text.appendChild(create('div',{class:'feature-body', html: s.content}));
+  if(s.caption) text.appendChild(create('p',{class:'muted',html: s.caption}));
+  if(s.pdfButton) text.appendChild(create('a',{class:'btn-pdf',href:safePath(s.pdfButton.link),target:'_blank',rel:'noopener'}, [s.pdfButton.label]));
+  if((s.layout||'image-left') === 'image-left') cont.appendChild(media), cont.appendChild(text);
+  else cont.appendChild(text), cont.appendChild(media);
+  sec.appendChild(cont);
+  return sec;
 }
 
-function normalizeImage(path) {
-    return path || FALLBACK_IMAGE;
+function renderGridProfiles(s){
+  const sec = create('section',{class:'section grid-profiles'});
+  const cont = create('div',{class:'container'});
+  cont.appendChild(create('h2',{html: s.title}));
+  if(s.description) cont.appendChild(create('p',{class:'lead', html: s.description}));
+  const grid = create('div',{class:'profiles-grid'});
+  (s.cards||[]).forEach(c=>{
+    const card = create('article',{class:'profile-card'});
+    const imgWrap = create('div',{class:'profile-image'});
+    imgWrap.appendChild(create('img',{src: safePath(c.img), alt: c.name}));
+    const body = create('div',{class:'profile-body'});
+    body.appendChild(create('h4',{html: c.name}));
+    body.appendChild(create('p',{class:'muted', html: c.role}));
+    body.appendChild(create('p',{html: c.bio}));
+    card.appendChild(imgWrap); card.appendChild(body); grid.appendChild(card);
+  });
+  cont.appendChild(grid);
+  if(s.pdfButton) cont.appendChild(create('a',{class:'btn-pdf',href:safePath(s.pdfButton.link),target:'_blank',rel:'noopener'}, [s.pdfButton.label]));
+  sec.appendChild(cont);
+  return sec;
 }
 
-// DOM
-const feed = document.getElementById('feed');
-const sentinel = document.getElementById('feed-sentinel');
-const loadingScreen = document.getElementById('loading');
-
-const BATCH_SIZE = 6;
-let cursor = 0;
-let cycle = 0;
-
-function typeLabel(type) {
-    const labels = {
-        cover: 'Capa',
-        editorial: 'Editorial',
-        toc: 'Sumário',
-        'full-image-title': 'Destaque',
-        'text-page': 'Texto',
-        'chart-page': 'Dados',
-        'back-cover': 'Fechamento'
-    };
-    return labels[type] || 'Seção';
+function renderStatsSection(s){
+  const sec = create('section',{class:'section stats-section'+(s.theme==='dark'? ' stats-section--dark':'')});
+  const cont = create('div',{class:'container stats-inner'});
+  cont.appendChild(create('h2',{html: s.title}));
+  if(s.headline) cont.appendChild(create('p',{class:'lead', html: s.headline}));
+  if(s.text) cont.appendChild(create('p',{html: s.text}));
+  const statsWrap = create('div',{class:'stats-grid'});
+  (s.stats||[]).forEach(st=>{
+    const stEl = create('div',{class:'stat'});
+    stEl.appendChild(create('div',{class:'value', html: st.value}));
+    stEl.appendChild(create('div',{class:'label', html: st.label}));
+    statsWrap.appendChild(stEl);
+  });
+  cont.appendChild(statsWrap);
+  if(s.pdfButton) cont.appendChild(create('a',{class:'btn-pdf',href:safePath(s.pdfButton.link),target:'_blank',rel:'noopener'}, [s.pdfButton.label]));
+  sec.appendChild(cont);
+  return sec;
 }
 
-function renderTOC(items) {
-    const listItems = (items || []).map(it => {
-        return `
-            <li>
-                <span>${escapeHtml(it.label)}</span>
-                <span class="toc-page">${escapeHtml(it.page)}</span>
-            </li>
-        `;
-    }).join('');
-    return `<ul class="section-toc">${listItems}</ul>`;
+function renderFooterQr(s){
+  const sec = create('footer',{class:'site-footer footer-qr'});
+  const cont = create('div',{class:'container footer-qr__inner'});
+  const left = create('div',{class:'footer-qr__left'});
+  left.appendChild(create('h3',{html: s.title}));
+  left.appendChild(create('p',{html: s.text}));
+  const qr = create('img',{src: safePath(s.qrImage), alt: 'QR Code'});
+  const right = create('div',{class:'footer-qr__right'}); right.appendChild(qr);
+  cont.appendChild(left); cont.appendChild(right);
+  const cr = create('div',{class:'footer-qr__copy', html: s.copyright || ''});
+  sec.appendChild(cont); sec.appendChild(cr);
+  return sec;
 }
 
-function renderChart(chartData) {
-    const entries = Object.entries(chartData || {});
-    const values = entries.map(([, v]) => Number(v) || 0);
-    const maxValue = Math.max(1, ...values);
-    const rows = entries.map(([label, value]) => {
-        const v = Number(value) || 0;
-        const pct = Math.max(0, Math.min(100, (v / maxValue) * 100));
-        return `
-            <div class="chart-row">
-                <div class="chart-label">${escapeHtml(label)}</div>
-                <div class="chart-barTrack" role="img" aria-label="${escapeHtml(label)}: ${escapeHtml(v)}">
-                    <div class="chart-barFill" style="width:${pct}%;"></div>
-                </div>
-                <div class="chart-value">${escapeHtml(v)}</div>
-            </div>
-        `;
-    }).join('');
-    return `<div class="chart">${rows}</div>`;
-}
-
-function renderSection(item, sectionIndex) {
-    const type = item.type;
-    const kicker = typeLabel(type);
-    const badge = `#${sectionIndex}`;
-
-    if (type === 'cover') {
-        const bg = normalizeImage(item.image);
-        return `
-            <section class="section section-type-cover section-hero" style="background-image:url('${escapeHtml(bg)}');">
-                <div class="section-inner">
-                    <div class="section-meta">
-                        <div class="section-kicker">${escapeHtml(kicker)}</div>
-                        <div class="section-badge">${escapeHtml(item.date || badge)}</div>
-                    </div>
-                    <div class="section-title">${escapeHtml(item.title || '')}</div>
-                    <div class="section-subtitle">${escapeHtml(item.subtitle || '')}</div>
-                </div>
-            </section>
-        `;
+function renderAll(list){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  list.forEach(s=>{
+    let node = null;
+    switch(s.type){
+      case 'hero': node = renderHero(s); break;
+      case 'text-block': node = renderTextBlock(s); break;
+      case 'feature-story': node = renderFeatureStory(s); break;
+      case 'grid-profiles': node = renderGridProfiles(s); break;
+      case 'stats-section': node = renderStatsSection(s); break;
+      case 'footer-qrcode': node = renderFooterQr(s); break;
+      default: node = create('section',{class:'section'}, [create('h3',{html: s.title||'Seção'})]);
     }
-
-    if (type === 'full-image-title') {
-        return `
-            <section class="section section-type-full-image-title">
-                <img class="section-media" src="${escapeHtml(normalizeImage(item.image))}" alt="${escapeHtml(item.title || 'Imagem')}" loading="lazy" ${imgFallbackAttr()}>
-                <div class="section-inner">
-                    <div class="section-meta">
-                        <div class="section-kicker">${escapeHtml(kicker)}</div>
-                        <div class="section-badge">${escapeHtml(badge)}</div>
-                    </div>
-                    <div class="section-title">${escapeHtml(item.title || '')}</div>
-                    ${item.subtitle ? `<div class="section-subtitle">${escapeHtml(item.subtitle)}</div>` : ''}
-                </div>
-            </section>
-        `;
-    }
-
-    if (type === 'toc') {
-        return `
-            <section class="section section-type-toc">
-                <div class="section-inner">
-                    <div class="section-meta">
-                        <div class="section-kicker">${escapeHtml(kicker)}</div>
-                        <div class="section-badge">${escapeHtml(badge)}</div>
-                    </div>
-                    <div class="section-title">${escapeHtml(item.title || 'Sumário')}</div>
-                    ${renderTOC(item.items)}
-                </div>
-            </section>
-        `;
-    }
-
-    if (type === 'editorial') {
-        return `
-            <section class="section section-type-editorial">
-                ${item.image ? `<img class="section-media" src="${escapeHtml(normalizeImage(item.image))}" alt="${escapeHtml(item.title || 'Editorial')}" loading="lazy" ${imgFallbackAttr()}>` : ''}
-                <div class="section-inner">
-                    <div class="section-meta">
-                        <div class="section-kicker">${escapeHtml(kicker)}</div>
-                        <div class="section-badge">${escapeHtml(badge)}</div>
-                    </div>
-                    <div class="section-title">${escapeHtml(item.title || '')}</div>
-                    <div class="section-text">${formatRichText(item.content || '')}</div>
-                    ${item.signature ? `<div class="section-quote">${escapeHtml(item.signature)}</div>` : ''}
-                </div>
-            </section>
-        `;
-    }
-
-    if (type === 'chart-page') {
-        return `
-            <section class="section section-type-chart-page">
-                <div class="section-inner">
-                    <div class="section-meta">
-                        <div class="section-kicker">${escapeHtml(kicker)}</div>
-                        <div class="section-badge">${escapeHtml(badge)}</div>
-                    </div>
-                    <div class="section-title">${escapeHtml(item.title || '')}</div>
-                    <div class="section-text">${formatRichText(item.text || '')}</div>
-                    ${renderChart(item.chartData)}
-                    ${item.pdfLink ? `<a href="${escapeHtml(item.pdfLink)}" target="_blank" class="pdf-link" rel="noopener">Abrir PDF</a>` : ''}
-                </div>
-            </section>
-        `;
-    }
-
-    if (type === 'back-cover') {
-        return `
-            <section class="section section-type-back-cover">
-                <div class="section-inner">
-                    <div class="section-meta">
-                        <div class="section-kicker">${escapeHtml(kicker)}</div>
-                        <div class="section-badge">${escapeHtml(badge)}</div>
-                    </div>
-                    <div class="section-title">${escapeHtml(item.title || '')}</div>
-                    <div class="section-text">${formatRichText(String(item.footer || '').replace(/\n/g, '\n\n'))}</div>
-                    ${item.website ? `<a class="pdf-link" href="https://${escapeHtml(item.website)}" target="_blank" rel="noopener">${escapeHtml(item.website)}</a>` : ''}
-                </div>
-            </section>
-        `;
-    }
-
-    const quote = item.quote ? `<div class="section-quote">${formatInline(item.quote)}</div>` : '';
-    const pdf = item.pdfLink ? `<a href="${escapeHtml(item.pdfLink)}" target="_blank" class="pdf-link" rel="noopener">Abrir PDF</a>` : '';
-    const signature = item.signature ? `<div class="section-quote">${escapeHtml(item.signature)}</div>` : '';
-
-    return `
-        <section class="section section-type-text-page">
-            <div class="section-inner">
-                <div class="section-meta">
-                    <div class="section-kicker">${escapeHtml(kicker)}</div>
-                    <div class="section-badge">${escapeHtml(badge)}</div>
-                </div>
-                <div class="section-title">${escapeHtml(item.title || '')}</div>
-                <div class="section-text">${formatRichText(item.text || '')}</div>
-                ${quote}
-                ${pdf}
-                ${signature}
-            </div>
-        </section>
-    `;
+    if(node) app.appendChild(node);
+  });
 }
 
-function getNextItem() {
-    if (magazineData.length === 0) return null;
-
-    const skipTypesAfterFirstCycle = new Set(['cover', 'toc', 'back-cover']);
-    const skipTitlesAfterFirstCycle = new Set(['Expediente', 'Referências (seleção)']);
-
-    for (let tries = 0; tries < magazineData.length + 2; tries++) {
-        const item = magazineData[cursor % magazineData.length];
-        cursor++;
-
-        if (cursor % magazineData.length === 0) cycle++;
-
-        if (cycle > 0) {
-            if (skipTypesAfterFirstCycle.has(item.type)) continue;
-            if (skipTitlesAfterFirstCycle.has(item.title)) continue;
-        }
-
-        return item;
-    }
-
-    return magazineData[0];
+/* progress bar update (if present) */
+function updateProgress(){
+  const bar = document.getElementById('progress-bar');
+  if(!bar) return;
+  const scrolled = window.scrollY || window.pageYOffset;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight>0 ? (scrolled / docHeight)*100 : 0;
+  bar.style.width = pct + '%';
 }
 
-function appendBatch() {
-    if (!feed || !sentinel) return;
-
-    const fragment = document.createDocumentFragment();
-    const currentCount = feed.querySelectorAll('.section').length;
-
-    for (let i = 0; i < BATCH_SIZE; i++) {
-        const item = getNextItem();
-        if (!item) break;
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = renderSection(item, currentCount + i + 1).trim();
-        if (wrapper.firstElementChild) fragment.appendChild(wrapper.firstElementChild);
-    }
-
-    feed.insertBefore(fragment, sentinel);
+function init(){
+  renderAll(magazineContent);
+  document.addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
 }
 
-function initFeed() {
-    if (!feed || !sentinel) return;
-
-    appendBatch();
-    appendBatch();
-
-    const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
-            appendBatch();
-        }
-    }, { root: null, threshold: 0.01, rootMargin: '800px 0px' });
-
-    observer.observe(sentinel);
-
-    if (loadingScreen) {
-        setTimeout(() => {
-            loadingScreen.classList.add('hidden');
-        }, 150);
-    }
-}
-
-document.addEventListener('DOMContentLoaded', initFeed);
+document.addEventListener('DOMContentLoaded', init);
