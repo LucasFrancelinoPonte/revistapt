@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revista Diacronia - Mulheres na Política Paraibana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --accent-color: #bfa15f; /* Tom dourado acadêmico */
+            --paper-color: #fdfbf7;
+            --text-color: #333;
+            --page-width: 400px;
+            --page-height: 580px;
+            --anim-duration: 0.8s;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #2c2c2c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Controles de Navegação */
+        .controls {
+            margin-top: 20px;
+            z-index: 100;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background 0.3s;
+            border-radius: 4px;
+        }
+
+        button:hover { background: #8c7335; }
+        button:disabled { background: #555; cursor: not-allowed; }
+
+        /* Estrutura do Livro */
+        .book {
+            position: relative;
+            width: var(--page-width);
+            height: var(--page-height);
+            perspective: 1500px;
+            transform-style: preserve-3d;
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform var(--anim-duration) cubic-bezier(0.645, 0.045, 0.355, 1);
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--paper-color);
+            backface-visibility: hidden;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        .back {
+            transform: rotateY(180deg);
+            border-right: 3px solid #eee; /* Lombada interna */
+        }
+
+        .front {
+            border-left: 3px solid #eee; /* Lombada interna */
+        }
+
+        /* Estilização do Conteúdo (Tipografia da Revista) */
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .drop-cap::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            float: left;
+            line-height: 0.8;
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        .quote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.2em;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 15px;
+            margin: 20px 0;
+            color: #555;
+        }
+
+        .footer-page {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            left: 0;
+        }
+
+        /* Capa */
+        .cover-content {
+            text-align: center;
+            border: 2px solid #000;
+            height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .masthead {
+            font-size: 3.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .cover-image {
+            width: 100%;
+            height: 250px;
+            background-color: #ccc;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Margarida_Maria_Alves.jpg/360px-Margarida_Maria_Alves.jpg'); /* Exemplo: Margarida Maria Alves, símbolo de luta */
+            background-size: cover;
+            background-position: center;
+            filter: grayscale(100%);
+            margin: 20px 0;
+        }
+
+        .headline {
+            font-size: 2.2em;
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .sub-headline {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+
+        /* Sumário */
+        .toc-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+        .toc-list li {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .toc-title { font-weight: bold; font-family: 'Playfair Display', serif; }
+
+        /* Classes Utilitárias */
+        .img-block {
+            width: 100%;
+            height: 150px;
+            background-color: #e0e0e0;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+
+        .black-box {
+            background-color: black;
+            color: white;
+            padding: 15px;
+            margin-top: auto;
+        }
+        .black-box h3 { color: white; font-size: 0.9em; text-transform: uppercase; margin-bottom: 5px; }
+
+        /* Responsividade para telas grandes (livro aberto) */
+        @media (min-width: 900px) {
+            .book {
+                width: 800px; /* Dobro da largura */
+            }
+            .page {
+                width: 50%; /* Metade do container */
+                right: 0; /* Começa na direita */
+                left: auto;
+            }
+            .page:nth-child(even) {
+               /* Páginas pares começam na esquerda logicamente no flip */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="book" id="book">
+        <div class="page" id="p1">
+            <div class="front">
+                <div class="cover-content">
+                    <div>
+                        <p style="text-align: center; letter-spacing: 3px; font-size: 0.8em;">DEZEMBRO 2025 | REVISTA</p>
+                        <h1 class="masthead">Diacronia</h1>
+                    </div>
+                    
+                    <div class="cover-image" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e6/Margarida_Maria_Alves.jpg');"></div>
+                    
+                    <div style="text-align: left;">
+                        <h2 class="headline">As Novas<br>Cunhatãs</h2>
+                        <p class="sub-headline">Gênero, Tradição e Ruptura na Liderança Paraibana</p>
+                    </div>
+
+                    <div class="black-box" style="text-align: left;">
+                        <h3>Empoderamento Político</h3>
+                        <h3>Governança Local</h3>
+                        <h3>Vozes da Mudança</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="back">
+                <div class="cover-content" style="border: none; text-align: left;">
+                    <h2 style="margin-bottom: 20px;">Carta do Editor</h2>
+                    [cite_start]<p class="drop-cap">A participação igualitária da mulher na tomada de decisões não constitui só uma exigência básica de justiça ou democracia[cite: 1060]. Esta edição da <em>Diacronia</em> mergulha nas raízes e no futuro da política paraibana.</p>
+                    [cite_start]<p>Historicamente, as mulheres foram excluídas das esferas públicas e dos processos decisórios, estigmatizadas como inferiores[cite: 1020]. No entanto, a Paraíba tem visto um ressurgimento da força feminina.</p>
+                    [cite_start]<p>Apesar da conquista do voto na década de 1930[cite: 1027], a paridade ainda é um horizonte distante. [cite_start]Nesta edição, celebramos as pioneiras e analisamos os dados que mostram que, embora a sociedade diga não ter preconceito[cite: 1214], os números nas urnas contam outra história.</p>
+                    <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 10px;">
+                        <p style="font-weight: bold;">Fabrício Endreon</p>
+                        <p style="font-size: 0.8em; color: #777;">Editor-Chefe</p>
+                    </div>
+                    <div class="footer-page">2</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="p2">
+            <div class="front">
+                <h2 style="border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 20px;">Nesta Edição</h2>
+                <ul class="toc-list">
+                    <li>
+                        <span class="toc-title">Pioneiras: O Legado de Vani e Dulce</span>
+                        <span>Pg. 4</span>
+                    </li>
+                    <li>
+                        <span class="toc-title">Bancada ALPB: O Cenário Atual</span>
+                        <span>Pg. 6</span>
+                    </li>
+                    <li>
+                        <span class="toc-title">Desafios: Oligarquias e Cotas</span>
+                        <span>Pg. 8</span>
+                    </li>
+                    <li>
+                        <span class="toc-title">O Futuro: Eleições Municipais</span>
+                        <span>Pg. 10</span>
+                    </li>
+                </ul>
+                
+                <div style="margin-top: 50px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bertha_Lutz_%28cropped%29.jpg/640px-Bertha_Lutz_%28cropped%29.jpg" class="img-block" style="height: 200px; filter: grayscale(100%);" alt="Bertha Lutz">
+                    <p class="quote">"A mulher é metade da população, a metade menos favorecida." - [cite_start]Bertha Lutz [cite: 1042]</p>
+                </div>
+                <div class="footer-page">3</div>
+            </div>
+            <div class="back">
+                <h3>Pioneiras Históricas</h3>
+                <p style="margin-top: 15px;">A história da mulher na política paraibana é marcada por hiatos e resistências. [cite_start]Somente na década de 1960, Maria Dulce Barbosa tornou-se a primeira mulher eleita prefeita na Paraíba, no município de Queimadas[cite: 359, 1077].</p>
+                [cite_start]<p>No legislativo estadual, o marco veio com Vani Braga, a primeira deputada estadual eleita em 1982. Essas mulheres romperam com a noção cultural de que a pureza feminina seria violada pela entrada na esfera pública[cite: 1047].</p>
+                [cite_start]<p>Contudo, a Paraíba jamais teve uma mulher eleita para o Governo do Estado, tendo apenas duas assumido interinamente: Lauremília Lucena e a desembargadora Fátima Bezerra Cavalcanti[cite: 1082, 1083].</p>
+                <div class="footer-page">4</div>
+            </div>
+        </div>
+
+        <div class="page" id="p3">
+            <div class="front">
+                <img src="https://www.al.pb.leg.br/wp-content/uploads/2019/01/300812_JG_Fachada_da_ALPB-14.jpg" class="img-block" alt="Fachada ALPB">
+                <h2>A Bancada da Resistência</h2>
+                [cite_start]<p class="drop-cap">A atual legislatura da Assembleia Legislativa da Paraíba (ALPB) conta com a segunda maior bancada feminina da história[cite: 1396]. São seis parlamentares que representam a diversidade e a força da mulher paraibana.</p>
+                <p>Francisca Mota, a decana, retorna para seu sexto mandato, trazendo a experiência de quem já presidiu a Casa. Ao lado dela, Camila Toscano, Cida Ramos, Dra. [cite_start]Paula, Jane Panta e a estreante Danielle do Vale[cite: 738, 739].</p>
+                <p>Cida Ramos, por exemplo, foi a deputada estadual mais votada da história política do Estado em 2018, oriunda dos movimentos estudantis e sindicais da UFPB.</p>
+                <div class="footer-page">5</div>
+            </div>
+            <div class="back">
+                <h3>O Perfil das Gestoras</h3>
+                <p>Quem são as mulheres que governam os municípios paraibanos? [cite_start]Estudos indicam que elas governam, majoritariamente, municípios pequenos, com menos de 10.000 habitantes e baixo desenvolvimento econômico[cite: 321, 557].</p>
+                [cite_start]<p>Em relação ao perfil, nota-se uma predominância de mulheres casadas (mais de 50%), com ensino superior completo[cite: 320, 527]. Isso sugere que, para a mulher entrar na política, exige-se um nível de qualificação formal muitas vezes superior ao dos homens, ou a validação através do matrimônio e laços familiares.</p>
+                [cite_start]<div class="quote">"A oligarquia da Paraíba espelhou uma combinação de fortes lealdades personalísticas e de recrutamento familiar." [cite: 522]</div>
+                <div class="footer-page">6</div>
+            </div>
+        </div>
+
+        <div class="page" id="p4">
+            <div class="front">
+                <h2>O Tabu das Cotas e dos Partidos</h2>
+                [cite_start]<p>Apesar da lei de cotas exigir 30% de candidaturas femininas[cite: 977, 1098], a realidade mostra que muitas candidaturas são fictícias. [cite_start]A pesquisa indica que 49% dos eleitores percebem a falta de apoio dos partidos como o principal motivo para a baixa representatividade[cite: 1280, 1295].</p>
+                [cite_start]<p>Curiosamente, 63% dos eleitores paraibanos afirmam que o gênero não influencia na hora do voto[cite: 1215], mas os resultados das urnas mostram uma sub-representação persistente. Isso aponta para barreiras estruturais dentro das legendas partidárias, onde os recursos e o tempo de TV são desiguais.</p>
+                [cite_start]<p>Em 2016, por exemplo, houve uma queda no número de prefeitas eleitas na Paraíba em relação a 2012, caindo de 49 para 39 gestoras[cite: 1113, 1114].</p>
+                <div class="footer-page">7</div>
+            </div>
+            <div class="back">
+                <div class="cover-content" style="background-color: var(--primary-color); color: white; border: none;">
+                    <div style="text-align: center; margin-top: 50%;">
+                        <h1 style="color: white;">Diacronia</h1>
+                        <p style="color: #ccc; margin-top: 20px;">A revista acadêmica da política paraibana.</p>
+                        <hr style="border-color: #555; margin: 20px auto; width: 50%;">
+                        [cite_start]<p style="font-size: 0.8em; color: #999;">ISSN: 2966-0521 [cite: 941]</p>
+                        <p style="font-size: 0.8em; color: #999;">João Pessoa - PB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn" disabled>❮ Anterior</button>
+        <button id="nextBtn">Próxima ❯</button>
+    </div>
+
+    <script>
+        const prevBtn = document.querySelector("#prevBtn");
+        const nextBtn = document.querySelector("#nextBtn");
+        const book = document.querySelector("#book");
+
+        const pages = document.querySelectorAll(".page");
+        let currentPage = 1;
+        const totalPages = pages.length; // Quantidade de folhas (não páginas numeradas)
+
+        // Configurar Z-Index inicial
+        // A página 1 deve estar no topo, a última no fundo.
+        pages.forEach((page, index) => {
+            page.style.zIndex = totalPages - index;
+        });
+
+        nextBtn.addEventListener("click", () => {
+            if (currentPage <= totalPages) {
+                // Virar a página atual para a esquerda
+                document.querySelector(`#p${currentPage}`).style.transform = "rotateY(-180deg)";
+                currentPage++;
+                updateButtons();
+            }
+        });
+
+        prevBtn.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                // Virar a página anterior de volta para 0
+                document.querySelector(`#p${currentPage}`).style.transform = "rotateY(0deg)";
+                updateButtons();
+            }
+        });
+
+        function updateButtons() {
+            // Se estamos na página 1 (capa fechada), não tem anterior
+            prevBtn.disabled = currentPage === 1;
+            
+            // Se viramos todas as páginas, não tem próxima
+            nextBtn.disabled = currentPage > totalPages;
+        }
+    </script>
+</body>
+</html>
