@@ -40,7 +40,7 @@ const magazineContent = [
         content: `A história política feminina na Paraíba tem marcos indeléveis. Maria Dulce Barbosa fez história na década de 1960 ao ser eleita a primeira prefeita do estado, no município de Queimadas, rompendo com a noção de que o executivo era lugar exclusivo de homens.
         
         No legislativo estadual, o silêncio foi quebrado em 1982 por Vani Braga, a primeira deputada estadual eleita. Sua trajetória pavimentou o caminho para que, décadas depois, a ALPB alcançasse sua segunda maior bancada feminina da história.`,
-        image: 'assets/images/Vani-Braga1-922x639.jpg',
+        image: 'assets/images/vanebraga.jpg',
         caption: 'Vani Braga: A voz pioneira na Casa de Epitácio Pessoa.',
         pdfButton: { label: 'Ler Artigo Acadêmico', link: 'assets/pdfs/nayara_sandy,+artigo_6.pdf' }
     },
