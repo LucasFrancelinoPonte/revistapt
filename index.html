@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diacronia: As Novas Cunhatãs - V2</title>
+    <title>Diacronia: As Novas Cunhatãs</title>
     <meta name="description" content="Revista digital interativa sobre a participação feminina na política paraibana">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,32 +22,13 @@
     <div class="magazine-wrapper">
         <header class="magazine-header">
             <div class="logo">DIACRONIA</div>
-            <div class="page-counter">
-                Página <span id="current-page">1</span> / <span id="total-pages">23</span>
-            </div>
+            <div class="tagline">Edição digital • Rolagem infinita</div>
         </header>
 
-        <!-- Book Container with Dynamic Centering -->
-        <div class="book-container" id="book-container">
-            <div class="book" id="book">
-                <!-- Pages will be dynamically inserted here -->
-            </div>
-        </div>
-
-        <div class="controls">
-            <button id="prev-btn" class="nav-btn" disabled>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <span>Anterior</span>
-            </button>
-            <button id="next-btn" class="nav-btn">
-                <span>Próxima</span>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M8 4L14 10L8 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </button>
-        </div>
+        <main class="feed" id="feed" aria-label="Revista Diacronia">
+            <!-- Sections will be dynamically inserted here -->
+            <div id="feed-sentinel" class="feed-sentinel" aria-hidden="true"></div>
+        </main>
     </div>
 
     <script src="script.js"></script>
