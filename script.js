@@ -27,8 +27,6 @@ const magazineContent = [
         text: `A presença feminina na política da Paraíba não é apenas estatística; é uma narrativa de ruptura. Desde a conquista do voto em 1932 até a atual bancada histórica na ALPB, esta edição celebra a resistência.
         
         Com base em dados acadêmicos e fatos históricos, traçamos o perfil de quem decide o futuro do estado, desafiando o coronelismo e as estruturas tradicionais de poder.`,
-        author: 'Renan Rodrigues',
-        role: 'Editor-Chefe',
         image: 'assets/images/imagem2.jpeg'
     },
 
