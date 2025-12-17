@@ -40,6 +40,8 @@ const magazineContent = [
         content: `A história política feminina na Paraíba tem marcos indeléveis. Maria Dulce Barbosa fez história na década de 1960 ao ser eleita a primeira prefeita do estado, no município de Queimadas, rompendo com a noção de que o executivo era lugar exclusivo de homens.
         
         No legislativo estadual, o silêncio foi quebrado em 1982 por Vani Braga, a primeira deputada estadual eleita. Sua trajetória pavimentou o caminho para que, décadas depois, a ALPB alcançasse sua segunda maior bancada feminina da história.`,
+      author: 'Theo Nogueira Virginio',
+      date: '14/12/2025',
         image: 'assets/images/vanebraga.jpg',
         caption: 'Vani Braga: A voz pioneira na Casa de Epitácio Pessoa.',
         pdfButton: { label: 'Ler Artigo Acadêmico', link: 'assets/pdfs/nayara_sandy,+artigo_6.pdf' }
@@ -193,6 +195,13 @@ function renderFeatureStory(s){
   if(s.category) text.appendChild(create('div',{class:'muted',html: s.category}));
   text.appendChild(create('h2',{html: s.title}));
   if(s.headline) text.appendChild(create('h3',{html: s.headline}));
+  // Byline: autor e data (ex.: Por Theo Nogueira Virginio — 16/12/2025)
+  if(s.author || s.date){
+    const authorText = s.author ? `Por ${s.author}` : '';
+    const dateText = s.date ? `${s.date}` : '';
+    const joiner = (s.author && s.date) ? ' — ' : '';
+    text.appendChild(create('p',{class:'muted byline', html: `${authorText}${joiner}${dateText}`}));
+  }
   text.appendChild(create('div',{class:'feature-body', html: s.content}));
   if(s.caption) text.appendChild(create('p',{class:'muted',html: s.caption}));
   if(s.pdfButton) text.appendChild(create('a',{class:'btn-pdf',href:safePath(s.pdfButton.link),target:'_blank',rel:'noopener'}, [s.pdfButton.label]));
