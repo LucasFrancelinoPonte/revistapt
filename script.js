@@ -27,7 +27,9 @@ const magazineContent = [
         text: `A presença feminina na política da Paraíba não é apenas estatística; é uma narrativa de ruptura. Desde a conquista do voto em 1932 até a atual bancada histórica na ALPB, esta edição celebra a resistência.
         
         Com base em dados acadêmicos e fatos históricos, traçamos o perfil de quem decide o futuro do estado, desafiando o coronelismo e as estruturas tradicionais de poder.`,
-        image: 'assets/images/imagem2.jpeg'
+        author: 'Theo Nogueira Virginio',
+        date: '14/12/2025',
+        image: 'assets/images/imagem2.jpeg',
     },
 
     // --- SEÇÃO 3: ARTIGO HISTÓRICO (Fonte: nayara_sandy.pdf) ---
@@ -176,9 +178,14 @@ function renderTextBlock(s){
   imgWrap.appendChild(create('img',{src:safePath(s.image), alt: s.title || ''}));
   const txt = create('div',{class:'text-block__content'});
   if(s.category) txt.appendChild(create('div',{class:'muted',html: s.category}));
+  if(s.author || s.date){
+    const authorText = s.author ? `Por ${s.author}` : '';
+    const dateText = s.date ? `${s.date}` : '';
+    const joiner = (s.author && s.date) ? ' — ' : '';
+    txt.appendChild(create('p',{class:'muted byline', html: `${authorText}${joiner}${dateText}`}));
+  }
   txt.appendChild(create('h2',{html: s.title}));
   txt.appendChild(create('div',{class:'text-block__body', html: s.text || s.content || ''}));
-  if(s.author) txt.appendChild(create('p',{class:'muted',html: `— ${s.author}${s.role? ', '+s.role: ''}`}));
   if(s.pdfButton) txt.appendChild(create('a',{class:'btn-pdf',href:safePath(s.pdfButton.link),target:'_blank',rel:'noopener'}, [s.pdfButton.label]));
   if((s.layout||'image-right') === 'image-left') cont.appendChild(imgWrap), cont.appendChild(txt);
   else cont.appendChild(txt), cont.appendChild(imgWrap);
